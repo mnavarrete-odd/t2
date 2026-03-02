@@ -9,6 +9,7 @@ import threading
 import time
 from typing import Dict, List, Optional
 
+from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -184,6 +185,13 @@ class InventoryNode(Node):
     def _setup_core_components(self):
         self.detector_manager: Optional[DetectorManager] = None
         if self.enable_detection:
+            if not Path(self.detector_model_path).exists():
+                raise FileNotFoundError(
+                    "Detector model not found. "
+                    f"detector_model_path='{self.detector_model_path}'. "
+                    "Set an absolute path in config/inventory_node_config.yaml "
+                    "or place the model under share/pallet_vision/models."
+                )
             self.detector_manager = DetectorManager(
                 model_path=self.detector_model_path,
                 confidence=self.detector_confidence,
@@ -514,10 +522,31 @@ class InventoryNode(Node):
         p = Path(raw).expanduser()
         if p.is_absolute():
             return str(p)
+
+        # 1) Package source path (development mode).
         source_path = (PROJECT_ROOT / p).resolve()
         if source_path.exists():
             return str(source_path)
-        return str((Path(os.getcwd()) / p).resolve())
+
+        # 2) Installed package share path (runtime mode).
+        share_candidate = None
+        try:
+            pkg_share = Path(get_package_share_directory("pallet_vision"))
+            share_candidate = (pkg_share / p).resolve()
+            if share_candidate.exists():
+                return str(share_candidate)
+        except Exception:
+            share_candidate = None
+
+        # 3) Current working directory as fallback.
+        cwd_path = (Path(os.getcwd()) / p).resolve()
+        if cwd_path.exists():
+            return str(cwd_path)
+
+        # Return best-effort candidate so error messages show expected location.
+        if share_candidate is not None:
+            return str(share_candidate)
+        return str(source_path)
 
     def _get_str(self, name: str) -> str:
         return self.get_parameter(name).get_parameter_value().string_value

@@ -175,6 +175,19 @@ Config SAP:
 
 - `config/sap_event_config.yaml`
 
+Formato del YAML de SAP (ROS2 params):
+
+```yaml
+sap_event_node:
+  ros__parameters:
+    host: "0.0.0.0"
+    port: 8080
+    api_endpoint: "/api/signal"
+    auth_enabled: false
+    auth_api_key: ""
+    max_request_size: 10485760
+```
+
 ## 11. Autenticación de API (opcional)
 
 En `config/sap_event_config.yaml`:
@@ -201,3 +214,19 @@ curl -X POST http://127.0.0.1:8080/api/signal \
 - Sin conteo en `/inventory/count/*`: revisar detecciones y que exista `ITEM_START` activo.
 - Error de modelo YOLO: validar `detector_model_path` y archivo en `models/`.
 
+## 13. Error típico en PC nuevo y solución rápida
+
+Si aparece:
+
+- `Cannot have a value before ros__parameters` en `sap_event_config.yaml`
+
+Entonces el archivo no está en formato ROS2. Usa exactamente el formato de la sección 10.
+
+Si aparece:
+
+- `FileNotFoundError ... models/product_detector.pt`
+
+Entonces falta el modelo en el PC destino. Soluciones:
+
+1. Copiar el modelo a `src/pallet_vision/models/product_detector.pt` y recompilar.
+2. O poner ruta absoluta en `detector_model_path` dentro de `inventory_node_config.yaml`.

@@ -34,9 +34,26 @@ class SapEventNode(Node):
         self.port = self.get_parameter("port").get_parameter_value().integer_value
         self.endpoint = self.get_parameter("api_endpoint").get_parameter_value().string_value
 
-        self.auth_enabled = bool(self.config.get("auth", {}).get("enabled", False))
-        self.api_key = str(self.config.get("auth", {}).get("api_key", "")).strip()
-        self.max_request_size = int(self.config.get("api", {}).get("max_request_size", 10_485_760))
+        self.declare_parameter(
+            "auth_enabled", bool(self.config.get("auth", {}).get("enabled", False))
+        )
+        self.declare_parameter(
+            "auth_api_key", str(self.config.get("auth", {}).get("api_key", ""))
+        )
+        self.declare_parameter(
+            "max_request_size",
+            int(self.config.get("api", {}).get("max_request_size", 10_485_760)),
+        )
+
+        self.auth_enabled = (
+            self.get_parameter("auth_enabled").get_parameter_value().bool_value
+        )
+        self.api_key = (
+            self.get_parameter("auth_api_key").get_parameter_value().string_value.strip()
+        )
+        self.max_request_size = (
+            self.get_parameter("max_request_size").get_parameter_value().integer_value
+        )
 
         self._server = HTTPServer((self.host, self.port), self._make_handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
@@ -54,7 +71,8 @@ class SapEventNode(Node):
 
         try:
             with open(config_path, "r", encoding="utf-8") as f:
-                return yaml.safe_load(f)
+                raw = yaml.safe_load(f) or {}
+            return self._normalize_config(raw)
         except Exception:
             return {
                 "server": {"host": "0.0.0.0", "port": 8080},
@@ -65,6 +83,54 @@ class SapEventNode(Node):
                     "max_request_size": 10_485_760,
                 },
             }
+
+    def _normalize_config(self, raw: dict) -> dict:
+        """
+        Accept both formats:
+          1) ROS params file:
+             sap_event_node:
+               ros__parameters: {host, port, api_endpoint, auth_enabled, auth_api_key, max_request_size}
+          2) Legacy app config:
+             server/auth/api sections.
+        """
+        if "sap_event_node" in raw and isinstance(raw.get("sap_event_node"), dict):
+            ros_params = raw["sap_event_node"].get("ros__parameters", {})
+            if isinstance(ros_params, dict):
+                return {
+                    "server": {
+                        "host": str(ros_params.get("host", "0.0.0.0")),
+                        "port": int(ros_params.get("port", 8080)),
+                    },
+                    "auth": {
+                        "enabled": bool(ros_params.get("auth_enabled", False)),
+                        "api_key": str(ros_params.get("auth_api_key", "")),
+                    },
+                    "api": {
+                        "endpoint": str(ros_params.get("api_endpoint", "/api/signal")),
+                        "timeout": 30,
+                        "max_request_size": int(
+                            ros_params.get("max_request_size", 10_485_760)
+                        ),
+                    },
+                }
+
+        return {
+            "server": {
+                "host": str(raw.get("server", {}).get("host", "0.0.0.0")),
+                "port": int(raw.get("server", {}).get("port", 8080)),
+            },
+            "auth": {
+                "enabled": bool(raw.get("auth", {}).get("enabled", False)),
+                "api_key": str(raw.get("auth", {}).get("api_key", "")),
+            },
+            "api": {
+                "endpoint": str(raw.get("api", {}).get("endpoint", "/api/signal")),
+                "timeout": int(raw.get("api", {}).get("timeout", 30)),
+                "max_request_size": int(
+                    raw.get("api", {}).get("max_request_size", 10_485_760)
+                ),
+            },
+        }
 
     def _make_handler(self):
         node = self

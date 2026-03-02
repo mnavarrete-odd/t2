@@ -1,12 +1,8 @@
-server:
-  host: "0.0.0.0"
-  port: 8080
-
-auth:
-  enabled: false
-  api_key: ""
-
-api:
-  endpoint: "/api/signal"
-  timeout: 30
-  max_request_size: 10485760
+sap_event_node:
+  ros__parameters:
+    host: "0.0.0.0"
+    port: 8080
+    api_endpoint: "/api/signal"
+    auth_enabled: false
+    auth_api_key: ""
+    max_request_size: 10485760
