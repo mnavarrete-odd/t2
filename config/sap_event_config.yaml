@@ -1,0 +1,12 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+auth:
+  enabled: false
+  api_key: ""
+
+api:
+  endpoint: "/api/signal"
+  timeout: 30
+  max_request_size: 10485760

@@ -1,0 +1,46 @@
+inventory_node:
+  ros__parameters:
+    camera_names: "primary_camera,secondary_camera"
+
+    enable_detection: true
+    detector_mode: "shared"
+    detection_fps: 10.0
+    detection_mode: "realtime"
+    detector_model_path: "models/product_detector.pt"
+    detector_confidence: 0.5
+
+    sync_queue_size: 100
+    sync_max_delay: 0.3
+    max_frame_queue_size: 200
+
+    topic_picker_events: "/picker/events"
+    topic_inventory_state: "/inventory/state"
+    topic_order_result: "/inventory/order_result"
+    topic_count_primary: "/inventory/count/primary"
+    topic_count_secondary: "/inventory/count/secondary"
+    topic_perf_primary: "/inventory/perf/primary"
+    topic_perf_secondary: "/inventory/perf/secondary"
+    topic_detections_primary: "/inventory/detections/primary"
+    topic_detections_secondary: "/inventory/detections/secondary"
+
+    photographer_enabled: true
+    photographer_clear_events: false
+    photographer_base_dir: "/tmp/pallet_vision"
+    photographer_area_classes: "area_de_trabajo_pallet"
+    photographer_box_classes: "cajas,folio,manga,saco,producto"
+    photographer_person_classes: "persona"
+    photographer_hand_classes: "mano"
+    photographer_empty_classes: "area_de_trabajo_pallet"
+
+    counter_config_yaml: "config/counter_default.yaml"
+    counter_device: "auto"
+
+    boundary_wait_timeout_ms: 1500
+    boundary_max_frame_age_ms: 500
+
+    debug.save_kfs: false
+    debug.save_only_boundary_kfs: true
+    debug.save_counter_frames: false
+    debug.save_counter_video: false
+    debug.output_root: "/tmp/pallet_vision_debug"
+    debug.video_fps: 4
