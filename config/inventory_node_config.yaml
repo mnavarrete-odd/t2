@@ -5,7 +5,7 @@ inventory_node:
     enable_detection: true
     detector_mode: "shared"
     detection_fps: 10.0
-    detection_mode: "realtime"
+    detection_mode: "no_drop"
     detector_model_path: "models/product_detector.pt"
     detector_confidence: 0.5
 
@@ -24,19 +24,21 @@ inventory_node:
     topic_detections_secondary: "/inventory/detections/secondary"
 
     photographer_enabled: true
-    photographer_clear_events: false
-    photographer_base_dir: "/tmp/pallet_vision"
-    photographer_area_classes: "area_de_trabajo_pallet"
-    photographer_box_classes: "cajas,folio,manga,saco,producto"
+    photographer_clear_events: true
+    photographer_base_dir: "output/keyframes"
+    photographer_product_kf_model: "models/onlyProduct.pt"
+    photographer_product_kf_conf: 0.1
+    photographer_area_classes: "area_de_trabajo_carro,area_de_trabajo_pallet"
+    photographer_box_classes: "cajas,folio,producto"
     photographer_person_classes: "persona"
-    photographer_hand_classes: "mano"
-    photographer_empty_classes: "area_de_trabajo_pallet"
+    photographer_hand_classes: "producto_en_mano"
+    photographer_empty_classes: "carro_vacio,pallet_vacio"
 
     counter_config_yaml: "config/counter_default.yaml"
     counter_device: "auto"
 
     boundary_wait_timeout_ms: 1500
-    boundary_max_frame_age_ms: 500
+    boundary_max_frame_age_ms: 1500
 
     debug.save_kfs: false
     debug.save_only_boundary_kfs: true

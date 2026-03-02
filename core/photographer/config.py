@@ -54,39 +54,46 @@ class PhotographerConfig:
     area_min_conf: float = 0.1
     area_warmup_frames: int = 10
     area_stable_frames: int = 1
-    area_hold_frames: int = 30
-    area_expand_ratio: float = 0.2
+    area_hold_frames: int = 50
+    area_expand_ratio: float = 0.1
     area_refit_enabled: bool = True
-    area_refit_frames: int = 12
-    area_refit_center_dist_min_px: float = 10.0
-    area_refit_center_dist_max_px: float = 30.0
+    area_refit_frames: int = 20
+    area_refit_center_dist_min_px: float = 20.0
+    area_refit_center_dist_max_px: float = 100.0
     capture_all: bool = False
     clear_events: bool = True
-    person_dist_px: float = 5.0
-    person_near_enabled: bool = True
-    hand_dist_px: float = 500.0
+    person_dist_px: float = 450.0
+    person_near_enabled: bool = False
+    hand_dist_px: float = 400.0
     stable_area_frames: int = 5
     stable_area_movement_max: float = 0.01
-    stable_area_require_count_stability: bool = True
-    movement_by_area: bool = False
-    stable_reconfirm_frames: int = 5
+    stable_area_require_count_stability: bool = False
+    movement_by_area: bool = True
+    stable_reconfirm_frames: int = 2
     stable_empty_frames: int = 5
-    occlusion_start_ratio: float = 0.2
-    occlusion_end_ratio: float = 0.1
-    occlusion_start_frames: int = 2
-    occlusion_end_frames: int = 2
+    occlusion_start_ratio: float = 0.05
+    occlusion_end_ratio: float = 0.05
+    occlusion_start_frames: int = 1
+    occlusion_end_frames: int = 1
     occlusion_pre_offset_frames: int = 0
     occlusion_post_offset_frames: int = 0
-    occlusion_item_classes: tuple[str, ...] = ("producto", "cajas", "folio", "manga", "saco")
+    occlusion_item_classes: tuple[str, ...] = (
+        "producto",
+        "cajas",
+        "folio",
+        "manga",
+        "saco",
+        "producto_en_mano",
+    )
     occlusion_change_count_min: int = 1
     occlusion_change_coverage_min: float = 0.05
-    occlusion_change_confirm_frames: int = 2
+    occlusion_change_confirm_frames: int = 1
     occlusion_change_cooldown_frames: int = 10
     product_start_frames: int = 1
     product_end_frames: int = 1
     product_pre_offset_frames: int = 0
     product_post_offset_frames: int = 0
-    product_save_prepost: bool = True
+    product_save_prepost: bool = False
 
     @classmethod
     def from_keyframe_settings(

@@ -85,13 +85,17 @@ class InventoryNode(Node):
         self.declare_parameter("topic_detections_secondary", "/inventory/detections/secondary")
 
         self.declare_parameter("photographer_enabled", True)
-        self.declare_parameter("photographer_clear_events", False)
-        self.declare_parameter("photographer_base_dir", "/tmp/pallet_vision")
-        self.declare_parameter("photographer_area_classes", "area_de_trabajo_pallet")
-        self.declare_parameter("photographer_box_classes", "cajas,folio,manga,saco,producto")
+        self.declare_parameter("photographer_clear_events", True)
+        self.declare_parameter("photographer_base_dir", "output/keyframes")
+        self.declare_parameter("photographer_product_kf_model", "models/onlyProduct.pt")
+        self.declare_parameter("photographer_product_kf_conf", 0.1)
+        self.declare_parameter(
+            "photographer_area_classes", "area_de_trabajo_carro,area_de_trabajo_pallet"
+        )
+        self.declare_parameter("photographer_box_classes", "cajas,folio,producto")
         self.declare_parameter("photographer_person_classes", "persona")
-        self.declare_parameter("photographer_hand_classes", "mano")
-        self.declare_parameter("photographer_empty_classes", "area_de_trabajo_pallet")
+        self.declare_parameter("photographer_hand_classes", "producto_en_mano")
+        self.declare_parameter("photographer_empty_classes", "carro_vacio,pallet_vacio")
 
         self.declare_parameter("counter_config_yaml", "config/counter_default.yaml")
         self.declare_parameter("counter_device", "auto")
@@ -136,6 +140,10 @@ class InventoryNode(Node):
         self.photographer_enabled = self._get_bool("photographer_enabled")
         self.photographer_clear_events = self._get_bool("photographer_clear_events")
         self.photographer_base_dir = self._resolve_path(self._get_str("photographer_base_dir"))
+        self.photographer_product_kf_model = self._resolve_path(
+            self._get_str("photographer_product_kf_model")
+        )
+        self.photographer_product_kf_conf = self._get_float("photographer_product_kf_conf")
         self.photographer_area_classes = self._csv_to_list(self._get_str("photographer_area_classes"))
         self.photographer_box_classes = self._csv_to_list(self._get_str("photographer_box_classes"))
         self.photographer_person_classes = self._csv_to_list(self._get_str("photographer_person_classes"))
@@ -217,6 +225,8 @@ class InventoryNode(Node):
             self.photographers[cam] = PhotographerAdapter(
                 camera_name=cam,
                 out_dir=out_dir,
+                product_kf_model=self.photographer_product_kf_model,
+                product_kf_conf=self.photographer_product_kf_conf,
                 area_classes=self.photographer_area_classes,
                 box_classes=self.photographer_box_classes,
                 person_classes=self.photographer_person_classes,
