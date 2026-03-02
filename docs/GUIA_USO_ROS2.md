@@ -53,7 +53,7 @@ Estructura esperada:
 cd ~/ws_pallet/src/pallet_vision
 python3 -m pip install -r requirements.txt
 ```
-
+ros2 run multicam simulate_camera --fps 1 --folder "~/Oddness/Cencosud/cenco_ws/data/data_captured_26_02/output/pickeo_26_02"
 ## 5. Compilar
 
 ```bash

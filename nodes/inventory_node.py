@@ -66,7 +66,7 @@ class InventoryNode(Node):
         self.declare_parameter("detector_mode", "shared")
         self.declare_parameter("detection_fps", 10.0)
         self.declare_parameter("detection_mode", "realtime")
-        self.declare_parameter("detector_model_path", "models/product_detector.pt")
+        self.declare_parameter("detector_model_path", "models/11-NEW.pt")
         self.declare_parameter("detector_confidence", 0.3)
 
         self.declare_parameter("sync_queue_size", 100)
